@@ -14,6 +14,7 @@ export default function verifyEmailPage() {
     const [token,setToken] = React.useState("")
     const [verified, setVerified] = React.useState(false)
     const [error,setError] = useState(false)
+    const [loading,setLoading] = useState(false)
 
     const verifyUserEmail = async () => {
         try {
@@ -29,10 +30,11 @@ export default function verifyEmailPage() {
             console.log(responseData,"after json")
             if (responseData.success) {
                 setVerified(true)
+                setLoading(true)
                 toast.success("Account has been verified")
             }
             else {
-
+                setLoading(true)
                 toast.error(responseData.message + ' you account is at stake')
             }
 
@@ -57,22 +59,35 @@ export default function verifyEmailPage() {
     return (
         <>
         <Toaster position="top-center" reverseOrder={false} />
-        {verified ? <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h3 className="sm:text-4xl">Email has been verified</h3>
+        {!loading ? (
+    <div className="flex flex-col items-center justify-center py-2">
+        <h3>Loading please wait....</h3>
+    </div>
+) : (
+    verified ? (
+        <div className="flex flex-col items-center justify-center min-h-screen py-2">
+            <h3 className="sm:text-4xl">Email Verified</h3>
             <button
-            className="sm:mt-10 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-            onClick={()=> router.push('/login')}
-            >Login</button>
+                className="sm:mt-10 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                onClick={() => router.push('/login')}
+            >
+                Login
+            </button>
+        </div>
+    ) : (
+        <div className="flex flex-col items-center justify-center min-h-screen py-2">
+            <h3 className="sm:text-4xl">Looks like your verification link has expired</h3>
+            <p>No worries, click the button below for a new Verification link.</p>
+            <button
+            onClick={() => router.push('/verifyAccount')}
+                className="sm:mt-10 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+            >
+                Generate Verification Request
+            </button>
+        </div>
+    )
+)}
 
-        </div> : 
-            <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h3 className="sm:text-4xl">Look's like your verification link has expired</h3>
-            <p>No worries click below button for new Verfication link </p>
-            <button
-            className="sm:mt-10 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-            >Generate Verfication Request</button>
-            </div>
-        }
         </>
     )
 }

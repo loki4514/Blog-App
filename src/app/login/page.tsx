@@ -8,8 +8,12 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { duration } from "moment";
 
+// 
+type FormFields = {
+    email : string;
+    password : string
 
-type 
+}
 
 export default function LoginPage() {
     const route = useRouter()
@@ -41,45 +45,54 @@ export default function LoginPage() {
     }
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        SetErrors({email : "", password :""})
-
-        if (!user.email.includes("@")){
-            SetErrors({...errors, email : "Email must include @"})
-            return
+        e.preventDefault();
+        SetErrors({ email: "", password: "" });
+    
+        if (!user.email) {
+            SetErrors({ ...errors, email: "Please enter email field" });
+            return;
         }
-
-        if (!user.password){
-            SetErrors({...errors, password : "Enter password"})
-            return
+    
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+        if (!emailPattern.test(user.email)) {
+            SetErrors({ ...errors, email: "Invalid email format" });
+            return;
         }
-
-
-
+    
+        if (user.password.length < 2) {
+            SetErrors({ ...errors, password: "Enter password" });
+            return;
+        }
+    
+        // Check the length of the password
+        // if (user.password.length < 1) {
+        //     SetErrors({ ...errors, password: "Password must be at least 1 character long" });
+        //     return;
+        // }
+    
         try {
-            const response : any = await axios.post('/api/login', {
-                email : user.email,
-                password : user.password
-            })
+            const response: any = await axios.post('/api/login', {
+                email: user.email,
+                password: user.password
+            });
+    
             const responseData = response.data;
-            console.log(responseData)
-
+            console.log(responseData);
+    
             if (responseData.success) {
-                toast.success("Login Sucessful")
+                toast.success("Login Successful");
                 setTimeout(() => {
-                    route.push('/')
+                    route.push('/');
                 }, 1500);
-                
-            }
-            else {
+            } else {
                 toast.error(responseData.message);
             }
-
         } catch (error: any) {
-            toast.error("Something went wrong from front end")
+            toast.error("Something went wrong from the front end");
         }
-
-    }
+    };
+    
     console.log(user)
 
 
