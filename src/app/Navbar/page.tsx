@@ -6,9 +6,13 @@ import Cookies from 'js-cookie'
 import { JwtPayload, jwtDecode } from "jwt-decode"
 import Avatar from 'react-avatar';
 import Link from 'next/link'
+import { signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
-    console.log("Hey bro i'm from navbar component home is been called")
+
+    const {data:session} = useSession()
+    
+    
 
     interface User {
         id: string;
@@ -54,9 +58,8 @@ export default function Navbar() {
     }, [menu]);
 
     const logout = () => {
-        Cookies.remove('token')
-        setUser(false)
-        router.push('/login')
+        signOut()
+        router.push("/login")
     }
 
     return (
@@ -90,7 +93,7 @@ export default function Navbar() {
                                             <div className="tooltip-arrow" data-popper-arrow></div>
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-8 h-8 font-extrabold">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            <path stroke-linecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
                                     </div>
                                 </Link>
@@ -98,10 +101,10 @@ export default function Navbar() {
 
                             <div className="relative ml-3 sm:pr-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+                                    <path stroke-linecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
                                 </svg>
                             </div>
-                            {user ? (<div className="relative ml-3">
+                            {session ? (<div className="relative ml-3">
                                 <div>
                                     <button type="button" id="dropdownToggleButton" data-dropdown-toggle="dropdownToggle"
                                         className={`relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2   ${menu ? "focus:ring-white focus:ring-offset-2" : "focus:ring-offset-gray-800"} `}
@@ -111,7 +114,7 @@ export default function Navbar() {
                                         <span className="absolute -inset-1.5"></span>
                                         <span className="sr-only">Open user menu</span>
                                         {/* <img className="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" /> */}
-                                        <Avatar name={extUser?.name} className="rounded-full" size="50" />
+                                        <Avatar name={session.user?.name!} className="rounded-full" size="50" />
                                     </button>
 
                                 </div>

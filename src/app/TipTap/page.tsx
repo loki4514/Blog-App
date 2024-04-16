@@ -14,7 +14,9 @@ import Heading from '@tiptap/extension-heading'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import CodeBlock from '@tiptap/extension-code-block'
 import { lowlight } from 'lowlight'
+import Blockquote from '@tiptap/extension-blockquote'
 import css from 'highlight.js/lib/languages/css'
 import js from 'highlight.js/lib/languages/javascript'
 import ts from 'highlight.js/lib/languages/typescript'
@@ -37,14 +39,22 @@ const Tiptap = ({ content, onChange }: any) => {
         extensions: [
             Document,
             Paragraph,
+            CodeBlock.configure({
+                languageClassPrefix: 'language-js',
+                HTMLAttributes: {
+                    class: 'bg-slate-500',
+                },
+            }),
             Text,
             Heading.configure({
                 levels: [1, 2],
             }),
             CodeBlockLowlight.configure({
-                lowlight,
+
+                lowlight
             }),
             StarterKit.configure({
+                codeBlock: false,
                 bulletList: {
                     HTMLAttributes: {
                         class: "bullet_class",
@@ -57,11 +67,13 @@ const Tiptap = ({ content, onChange }: any) => {
                 },
                 heading: {
                     HTMLAttributes: {
-                        class: `font-size: inherit font-weight: inherit`,
+                        class: ``,
                     },
                 },
             }),
-            Image,
+            Image.configure({
+                inline: true,
+            }),
             BulletList.configure({
                 HTMLAttributes: {
                     class: 'list-disc pl-13'
@@ -69,9 +81,20 @@ const Tiptap = ({ content, onChange }: any) => {
             }),
             ListItem,
             Underline,
+            Blockquote.configure({
+                HTMLAttributes: {
+                    class: 'p-4 my-4 border-s-4 border-slate-300 bg-gray-50',
+                },
+            }),
+            Link.extend({
+                inclusive: false
+            }),
             Link.configure({
                 openOnClick: false,
                 autolink: true,
+                HTMLAttributes: {
+                    class: 'underline',
+                },
             }),
             OrderedList.configure({
                 HTMLAttributes: {
@@ -80,28 +103,12 @@ const Tiptap = ({ content, onChange }: any) => {
             })
         ],
         content: `
-        <p>
-          That’s a boring paragraph followed by a fenced code block:
-        </p>
-        <pre><code class="language-javascript">for (var i=1; i <= 20; i++)
-{
-  if (i % 15 == 0)
-    console.log("FizzBuzz");
-  else if (i % 3 == 0)
-    console.log("Fizz");
-  else if (i % 5 == 0)
-    console.log("Buzz");
-  else
-    console.log(i);
-}</code></pre>
-        <p>
-          Press Command/Ctrl + Enter to leave the fenced code block and continue typing in boring paragraphs.
-        </p>
+        
       `,
         editorProps: {
             attributes: {
                 class:
-                    "flex flex-col px-6 py-3 justify-start border-b border-r text-black border-l border-gray-700  items-start w-full gap-3 pt-4 rounded-bl-md rounded-br-md outline-none"
+                    "flex flex-col px-6 py-3 justify-start  border-b border-r text-black border-l border-gray-700  items-start w-full gap-3 pt-4 rounded-bl-md rounded-br-md outline-none"
             }
         },
         onUpdate: ({ editor }) => {
@@ -112,7 +119,9 @@ const Tiptap = ({ content, onChange }: any) => {
     return (
         <>
             <div className='w-full px-4'>
-                <Toolbar editor={editor} content={content}></Toolbar>
+                <div className='sticky top-0 z-10 bg-gray-50'>
+                    <Toolbar editor={editor} content={content}></Toolbar>
+                </div>
                 <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
             </div>
 

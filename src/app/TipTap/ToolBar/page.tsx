@@ -1,7 +1,7 @@
 "use client"
 
 import { Editor } from "@tiptap/react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
     Bold,
     Strikethrough,
@@ -16,8 +16,11 @@ import {
     Redo,
     Code,
     Link,
-    Image,
+    Images,
 } from "lucide-react";
+
+
+import Image from 'next/image';
 
 type Props = {
     editor: Editor | null;
@@ -26,37 +29,44 @@ type Props = {
 
 export default function Toolbar({ editor, content }: Props) {
 
+
+    const [image, setImage] = useState(null);
+
+
+
+
     if (!editor) {
         return null
     }
     console.log(editor)
 
-    const setLink = useCallback(() => {
-        const previousUrl = editor.getAttributes('link').href
-        const url = window.prompt('URL', previousUrl)
+    // const setLink = useCallback(() => {
+    //     const previousUrl = editor.getAttributes('link').href
+    //     const url = window.prompt('URL', previousUrl)
 
-        // cancelled
-        if (url === null) {
-            return
-        }
+    //     // cancelled
+    //     if (url === null) {
+    //         return
+    //     }
 
-        // empty
-        if (url === '') {
-            editor.chain().focus().extendMarkRange('link').unsetLink()
-                .run()
+    //     // empty
+    //     if (url === '') {
+    //         editor.chain().focus().extendMarkRange('link').unsetLink()
+    //             .run()
 
-            return
-        }
+    //         return
+    //     }
 
-        // update link
-        editor.chain().focus().extendMarkRange('link').setLink({ href: url })
-            .run()
-    }, [editor])
+    //     // update link
+    //     editor.chain().focus().extendMarkRange('link').setLink({ href: url })
+    //         .run()
+    // }, [editor])
 
 
 
     return (
         <>
+        <div className="relative">
             <div className="px-4 py-3 rounded-tl-md rounded-tr-md flex justify-between items-start
     gap-5 w-full flex-wrap border border-gray-700">
                 <div className="flex justify-start items-center gap-5 w-full lg:w-10/12 flex-wrap ">
@@ -77,15 +87,21 @@ export default function Toolbar({ editor, content }: Props) {
                     <button
                         onClick={(e: any) => {
                             e.preventDefault()
-                            editor.chain().focus().toggleHeading({ level: 1 }).run()
+                            // const typeimp = window.getSelection()?.toString().trim()
+                            // console.log(typeimp)
+                            editor.chain().focus().toggleHeading( {
+                                level: 1
+                            }).run()
                         }}
                         className={
                             editor.isActive("heading", { level: 1 })
-                                ? "bg-slate-500 text-white p-2  text-3xl rounded-lg"
+                                ? "bg-slate-500 text-white p-2 text-3xl rounded-lg"
                                 : "text-bold text-3xl"
                         }
+                        style={{ fontSize: 'x-large' }}
 
                     >
+                        
                         <Heading1 className="w-5 h-5" />
                     </button>
                     <button
@@ -186,9 +202,12 @@ export default function Toolbar({ editor, content }: Props) {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            const url1 = window.prompt('Enter link URL:');
+                            const url1 = window.getSelection()?.toString().trim();
+                            // const typeimp = window.getSelection()?.toString().trim()
+                            // console.log(typeimp)
+
                             if (url1) {
-                                editor.chain().focus().extendMarkRange('link').setLink({ href : url1, target: '_blank' }).run();
+                                editor.chain().focus().extendMarkRange('link').setLink({ href: url1, target: '_blank' }).run();
                             }
                         }}
                         className={
@@ -202,10 +221,21 @@ export default function Toolbar({ editor, content }: Props) {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            const url = window.prompt('Enter image URL:');
-                            if (url) {
-                                editor.chain().focus().setImage({ src: url }).run();
-                            }
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*';
+                            input.onchange = (event : any) => {
+                                const file = event.target.files[0];
+                                if (file) {
+                                    const reader  = new FileReader();
+                                    reader.onload = (readerEvent : any) => {
+                                        const imageUrl = readerEvent.target.result;
+                                        editor.chain().focus().setImage({ src: imageUrl }).run();
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            };
+                            input.click();
                         }}
                         className={
                             editor.isActive("image")
@@ -213,7 +243,7 @@ export default function Toolbar({ editor, content }: Props) {
                                 : "text-bold"
                         }
                     >
-                        <Image className="w-5 h-5" />
+                        <Images className="w-5 h-5" />
                     </button>
                     <button
                         onClick={(e) => {
@@ -257,6 +287,7 @@ export default function Toolbar({ editor, content }: Props) {
 
                 </div>
 
+            </div>
             </div>
         </>
     )

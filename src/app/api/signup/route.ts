@@ -11,8 +11,22 @@ connect()
 
 export async function POST(request:NextRequest) {
     try {
-        const reqBody: { name: string; email: string; password: string } = await request.json();
-        const { name, email, password } = reqBody;
+        const reqBody: { name: string; email: string; password: string,confirm_password : string  } = await request.json();
+        const { name, email, password,confirm_password  } = reqBody;
+
+        if (name === '' || email === "" || password === ""|| confirm_password === "") {
+            return NextResponse.json({message : "Please enter all the fields", success : false})
+        }
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)){
+            return NextResponse.json({message : "Invalid email address", success : false})
+        }
+        if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/.test(password)){
+            return NextResponse.json({message : "Password must contain at least one digit, one lowercase letter, one uppercase letter, one special character, and be at least 8 characters long", success : false})
+        }
+        if (password !== confirm_password){
+            return NextResponse.json({message:"Password and Confirm Password must be same",success : false})
+        }
+
 
         console.log(reqBody)
 
